@@ -1,0 +1,3 @@
+#!/bin/sh
+# llm-memory command shim (Debian package): /usr/bin/llm-memory
+exec node /usr/lib/llm-memory/app/cli.cjs "$@"

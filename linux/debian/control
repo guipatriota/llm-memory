@@ -1,0 +1,13 @@
+Package: llm-memory
+Version: @VERSION@
+Section: utils
+Priority: optional
+Architecture: all
+Depends: git, nodejs (>= 18), gh
+Maintainer: Guilherme Ditzel Patriota <guipatriota@gmail.com>
+Homepage: https://github.com/guipatriota/llm-memory
+Description: Persistent, shared memory for Claude Code sessions
+ A private, Git-backed wiki vault that remembers your Claude Code sessions across
+ machines: a Stop hook captures every transcript, a scheduled headless run turns
+ them into wiki pages, and a weekly lint audits the store. GitHub private
+ repositories are the only server needed. Run `llm-memory init` after installing.

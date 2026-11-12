@@ -1,0 +1,9 @@
+#!/bin/sh
+set -e
+if [ "$1" = "configure" ]; then
+  echo "llm-memory installed. Each user sets up their own memory vault with:"
+  echo "    llm-memory init"
+  echo "llm-memory installé. Chaque utilisateur configure son propre coffre de mémoire avec :"
+  echo "    llm-memory init"
+fi
+exit 0
