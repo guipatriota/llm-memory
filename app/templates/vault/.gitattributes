@@ -1,0 +1,14 @@
+# LF in the repository and on disk everywhere: the same working tree may be read
+# from more than one operating system (for example Windows and WSL), and a per-machine
+# autocrlf would make one side see every file as modified.
+* text=auto eol=lf
+*.sh   text eol=lf
+*.cjs  text eol=lf
+
+# sources/ is ignored here and has its own .gitattributes (* -text): the raw backup
+# keeps the original bytes, no normalisation.
+
+# Two machines append to log.md and MEMORY.md on the same day: union keeps both
+# sides instead of a conflict. A duplicated index line is the lint's job, not git's.
+log.md    merge=union
+MEMORY.md merge=union

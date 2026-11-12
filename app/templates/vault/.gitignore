@@ -1,0 +1,14 @@
+# Raw transcripts: may contain secrets and are large. They live in their own private
+# repository nested here (see schema.md). NEVER version them in this repository.
+sources/
+# Run logs of the scheduled ingest/lint (local noise)
+.meta/runs/
+# Obsidian local state, caches, trash
+.obsidian/workspace*.json
+.obsidian/cache/
+.trash/
+# Node / OS
+node_modules/
+.DS_Store
+Thumbs.db
+desktop.ini
