@@ -67,4 +67,27 @@ function nodeMajor() {
   return Number(process.versions.node.split('.')[0]);
 }
 
-module.exports = { which, run, cmdQuote, nodeMajor, WIN };
+// A tool installed a minute ago (winget) is on the registry PATH but not on the PATH
+// of the process that launched us. Merge both registry values into process.env.PATH.
+function refreshWindowsPath() {
+  if (!WIN) return;
+  const read = (hive) => {
+    const r = spawnSync('reg', ['query', `${hive}\\Environment`, '/v', 'Path'], { encoding: 'utf8' });
+    const m = /Path\s+REG_(?:EXPAND_)?SZ\s+(.*)/i.exec(r.stdout || '');
+    return m ? m[1].trim() : '';
+  };
+  const hklm = read('HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager');
+  const hkcu = read('HKCU');
+  const expand = (s) => s.replace(/%([^%]+)%/g, (_, k) => process.env[k] || process.env[k.toUpperCase()] || '');
+  const current = (process.env.PATH || '').split(';');
+  const seen = new Set(current.map((p) => p.toLowerCase()));
+  for (const p of `${hklm};${hkcu}`.split(';').map(expand).filter(Boolean)) {
+    if (!seen.has(p.toLowerCase())) {
+      current.push(p);
+      seen.add(p.toLowerCase());
+    }
+  }
+  process.env.PATH = current.filter(Boolean).join(';');
+}
+
+module.exports = { which, run, cmdQuote, nodeMajor, refreshWindowsPath, WIN };
