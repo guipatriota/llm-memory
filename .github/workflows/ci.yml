@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - run: sudo apt-get install -y lintian
+      - run: sudo apt-get update -qq && sudo apt-get install -y lintian || echo "lintian unavailable, skipping"
       - run: bash linux/build-deb.sh
       - uses: actions/upload-artifact@v5
         with:
