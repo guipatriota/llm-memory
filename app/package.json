@@ -1,0 +1,10 @@
+{
+  "name": "llm-memory",
+  "version": "0.1.0",
+  "description": "Persistent, shared memory for Claude Code sessions: a private Git-backed wiki vault with automatic capture, ingest and lint.",
+  "license": "MIT",
+  "private": true,
+  "bin": { "llm-memory": "cli.cjs" },
+  "engines": { "node": ">=18" },
+  "scripts": { "test": "node --test test/" }
+}

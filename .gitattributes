@@ -1,0 +1,7 @@
+# LF everywhere: the same tree is built on Windows (Inno Setup) and Linux (dpkg).
+* text=auto eol=lf
+*.sh   text eol=lf
+*.cjs  text eol=lf
+*.iss  text eol=lf
+*.cmd  text eol=crlf
+*.ps1  text eol=crlf
