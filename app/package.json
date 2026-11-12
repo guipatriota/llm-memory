@@ -6,5 +6,5 @@
   "private": true,
   "bin": { "llm-memory": "cli.cjs" },
   "engines": { "node": ">=18" },
-  "scripts": { "test": "node --test test/" }
+  "scripts": { "test": "node --test test/config.test.cjs test/settings-hooks.test.cjs test/backfill.test.cjs" }
 }
