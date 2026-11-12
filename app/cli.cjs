@@ -100,7 +100,7 @@ async function main() {
       case 'sync': {
         const { vaultPath } = require('./lib/config.cjs');
         const { createSync } = require('./lib/vault-sync.cjs');
-        const s = createSync(vaultPath(), { ownerPid: process.ppid });
+        const s = createSync(vaultPath(), { ownerPid: process.ppid, sameHostRelease: true });
         const arg = args._[2];
         if (sub === 'begin' && arg) return s.begin(arg);
         if (sub === 'end' && arg) return s.end(arg);

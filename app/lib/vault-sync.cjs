@@ -36,7 +36,11 @@ function createSync(vault, opts = {}) {
   const LOCK_POLL = minutes('VAULT_SYNC_LOCK_POLL_MIN', 0.5);
   // Lock owner: the runner's own pid; the CLI `sync` subcommands use the parent shell's
   // pid (or VAULT_SYNC_PID) so that begin/end/release from separate invocations agree.
+  // Some shells (MSYS bash) give every child a different parent pid, so the CLI also
+  // passes sameHostRelease: the lock recorded in this clone's state file is released
+  // whenever it belongs to this host.
   const OWNER_PID = Number(process.env.VAULT_SYNC_PID) || opts.ownerPid || process.pid;
+  const SAME_HOST_RELEASE = Boolean(opts.sameHostRelease);
   const HOST = (process.env.VAULT_SYNC_HOST || os.hostname().split('.')[0]).toLowerCase();
 
   function git(args, o = {}) {
@@ -144,7 +148,9 @@ function createSync(vault, opts = {}) {
     if (!fs.existsSync(file)) return;
     const mine = fs.readFileSync(file, 'utf8').trim();
     // The file is per clone: a skipped run must not release the other run's lock.
-    if (!git(['log', '-1', '--format=%s', mine]).stdout.includes(` pid=${OWNER_PID} `)) return;
+    const subject = git(['log', '-1', '--format=%s', mine]).stdout;
+    const ours = subject.includes(` pid=${OWNER_PID} `) || (SAME_HOST_RELEASE && subject.startsWith(`${HOST} `));
+    if (!ours) return;
     // Lease on our sha: if another machine took the lock over (TTL), do not delete it.
     const ok = pushLock(mine, '');
     fs.unlinkSync(file);
