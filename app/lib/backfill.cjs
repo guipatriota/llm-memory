@@ -11,27 +11,45 @@ const sources = require('./sources.cjs');
 
 const MAX_BYTES = 95 * 1024 * 1024; // GitHub refuses files over 100 MB
 
-// First record with a cwd field, read line by line (the first records have none).
-async function transcriptCwd(file) {
+// The headless runs (ingest, lint, reconcile) are Claude Code sessions too. The Stop
+// hook skips them through CLAUDE_MEMORY_SKIP, but a transcript on disk carries no such
+// flag: recognise them by their first user message instead.
+const RUNNER_PROMPT = /^You are the (ingest|lint|reconciliation) agent of the llm-memory vault/;
+
+function messageText(rec) {
+  const m = rec && rec.message;
+  if (!m) return '';
+  if (typeof m.content === 'string') return m.content;
+  if (Array.isArray(m.content)) return m.content.map((c) => (c && c.text) || '').join(' ');
+  return '';
+}
+
+// { cwd, runner }: first cwd seen and whether the first user message is a runner prompt.
+async function transcriptInfo(file) {
   const rl = readline.createInterface({ input: fs.createReadStream(file, { encoding: 'utf8' }) });
-  let found = null;
+  const info = { cwd: null, runner: false };
+  let sawUser = false;
   let n = 0;
   for await (const line of rl) {
     n++;
     try {
       const rec = JSON.parse(line);
-      if (rec && typeof rec.cwd === 'string' && rec.cwd) {
-        found = rec.cwd;
-        break;
+      if (rec && typeof rec.cwd === 'string' && rec.cwd && !info.cwd) info.cwd = rec.cwd;
+      if (rec && rec.type === 'user' && !sawUser) {
+        sawUser = true;
+        info.runner = RUNNER_PROMPT.test(messageText(rec).trim());
       }
+      if (info.cwd && sawUser) break;
     } catch {
       /* partial or non-JSON line */
     }
     if (n > 200) break;
   }
   rl.close();
-  return found;
+  return info;
 }
+
+const transcriptCwd = async (file) => (await transcriptInfo(file)).cwd;
 
 async function backfill(vault, opts = {}) {
   const log = opts.log || (() => {});
@@ -51,8 +69,12 @@ async function backfill(vault, opts = {}) {
         log(`too large for GitHub, skipped: ${file}`);
         continue;
       }
-      const cwd = await transcriptCwd(file);
-      const slug = sources.projectSlug(cwd || '');
+      const info = await transcriptInfo(file);
+      if (info.runner) {
+        result.runner = (result.runner || 0) + 1;
+        continue;
+      }
+      const slug = sources.projectSlug(info.cwd || '');
       if (!slug) {
         result.noCwd++;
         continue;
@@ -82,4 +104,4 @@ async function backfill(vault, opts = {}) {
   return result;
 }
 
-module.exports = { backfill, transcriptCwd, MAX_BYTES };
+module.exports = { backfill, transcriptCwd, transcriptInfo, RUNNER_PROMPT, MAX_BYTES };

@@ -102,11 +102,19 @@ if (withClaude) {
   const sessions = path.join(vault, 'pages', 'sessions', 'demo-project');
   console.log('session pages:', fs.existsSync(sessions) ? fs.readdirSync(sessions) : []);
   console.log('MEMORY.md:\n' + fs.readFileSync(path.join(vault, 'MEMORY.md'), 'utf8'));
-  const all = sh('git', ['-C', vault, 'grep', '-l', 'ghp_FAKE1234567890'], { stdio: ['pipe', 'pipe', 'ignore'] }).split('\n').filter(Boolean);
+  let all = [];
+  try {
+    all = sh('git', ['-C', vault, 'grep', '-l', 'ghp_FAKE1234567890']).split(/\r?\n/).filter(Boolean);
+  } catch {
+    /* exit 1 = no match */
+  }
   if (all.length) throw new Error(`secret leaked into ${all.join(', ')}`);
   console.log('secret not present in the wiki: ok');
   step('second ingest (idempotence)');
   console.log(node(['ingest']));
+  step('lint (claude -p)');
+  console.log(node(['lint']));
+  console.log('lint reports:', fs.readdirSync(path.join(vault, '.meta')).filter((f) => f.startsWith('lint-')));
   console.log('vault log:', sh('git', ['-C', vault, 'log', '--oneline', '-5']));
 }
 

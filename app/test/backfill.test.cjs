@@ -20,6 +20,8 @@ function sandbox() {
   fs.writeFileSync(path.join(proj, 'aaaa-1111.jsonl'), lines.join('\n') + '\n');
   fs.writeFileSync(path.join(proj, 'sub-uuid', 'subagents', 'x.jsonl'), lines.join('\n'));
   fs.writeFileSync(path.join(proj, 'nocwd.jsonl'), JSON.stringify({ type: 'x' }) + '\n');
+  const runner = JSON.stringify({ type: 'user', cwd: '/v', message: { role: 'user', content: [{ type: 'text', text: prompt('ingest', 'fr') }] } });
+  fs.writeFileSync(path.join(proj, 'runner.jsonl'), runner + '\n');
   const vault = path.join(root, 'vault');
   fs.mkdirSync(path.join(vault, 'sources'), { recursive: true });
   return { claudeDir, vault, proj };
@@ -31,9 +33,10 @@ test('backfill copies top-level transcripts by project slug, idempotently', asyn
   process.env.CLAUDE_CONFIG_DIR = claudeDir;
   try {
     let r = await backfill(vault, { backup: false });
-    assert.strictEqual(r.scanned, 2);
+    assert.strictEqual(r.scanned, 3);
     assert.strictEqual(r.copied, 1);
     assert.strictEqual(r.noCwd, 1);
+    assert.strictEqual(r.runner, 1, 'headless runner transcripts are not backfilled');
     const dest = path.join(vault, 'sources', 'claude-code', 'demo-app', 'aaaa-1111.jsonl');
     assert.ok(fs.existsSync(dest));
     r = await backfill(vault, { backup: false });
