@@ -34,7 +34,9 @@ function createSync(vault, opts = {}) {
   const LOCK_TTL = minutes('VAULT_SYNC_LOCK_TTL_MIN', 60); // older lock = dead owner
   const LOCK_WAIT = minutes('VAULT_SYNC_LOCK_WAIT_MIN', 30); // wait for the other machine
   const LOCK_POLL = minutes('VAULT_SYNC_LOCK_POLL_MIN', 0.5);
-  const OWNER_PID = Number(process.env.VAULT_SYNC_PID) || process.pid;
+  // Lock owner: the runner's own pid; the CLI `sync` subcommands use the parent shell's
+  // pid (or VAULT_SYNC_PID) so that begin/end/release from separate invocations agree.
+  const OWNER_PID = Number(process.env.VAULT_SYNC_PID) || opts.ownerPid || process.pid;
   const HOST = (process.env.VAULT_SYNC_HOST || os.hostname().split('.')[0]).toLowerCase();
 
   function git(args, o = {}) {

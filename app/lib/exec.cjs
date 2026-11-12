@@ -9,7 +9,17 @@ const path = require('path');
 const WIN = process.platform === 'win32';
 
 // Full path of a command, or null. On Windows honours PATHEXT (.exe, .cmd, .bat).
+let refreshed = false;
+
 function which(name) {
+  const found = whichOnPath(name);
+  if (found || !WIN || refreshed) return found;
+  refreshed = true;
+  refreshWindowsPath();
+  return whichOnPath(name);
+}
+
+function whichOnPath(name) {
   const exts = WIN ? (process.env.PATHEXT || '.EXE;.CMD;.BAT').split(';') : [''];
   const dirs = (process.env.PATH || '').split(path.delimiter).filter(Boolean);
   for (const d of dirs) {
