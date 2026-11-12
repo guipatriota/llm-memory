@@ -43,6 +43,24 @@ function parse(argv) {
 async function main() {
   const args = parse(process.argv.slice(2));
   if (args.lang) setLang(args.lang);
+  if (typeof args.log === 'string') {
+    // Mirror everything written to the console into a log file (setup wizard).
+    const fs = require('fs');
+    fs.mkdirSync(require('path').dirname(args.log), { recursive: true });
+    const out = fs.openSync(args.log, 'a');
+    fs.writeSync(out, `== llm-memory ${process.argv.slice(2).filter((a) => a !== args.log).join(' ')} ${new Date().toISOString()} ==\n`);
+    for (const stream of [process.stdout, process.stderr]) {
+      const write = stream.write.bind(stream);
+      stream.write = (chunk, ...rest) => {
+        try {
+          fs.writeSync(out, typeof chunk === 'string' ? chunk : Buffer.from(chunk));
+        } catch {
+          /* log file unavailable */
+        }
+        return write(chunk, ...rest);
+      };
+    }
+  }
   const [cmd, sub] = args._;
   try {
     switch (cmd) {
