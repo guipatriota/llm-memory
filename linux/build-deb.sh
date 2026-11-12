@@ -5,7 +5,7 @@ set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
-VERSION="${1:-$(node -p "require('$ROOT/app/package.json').version")}"
+VERSION="${1:-$(grep -m1 '"version"' "$ROOT/app/package.json" | cut -d'"' -f4)}"
 STAGE="$(mktemp -d)"
 PKG="$STAGE/llm-memory"
 OUT="$ROOT/dist"

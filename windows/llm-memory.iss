@@ -189,30 +189,32 @@ end;
 
 { ---------------------------------------------------------------- prerequisites }
 
-procedure RefreshPrereqs();
 var
-  Missing: String;
-  procedure Line(Name, Exe: String);
-  var
-    Found: String;
+  PrereqMissing: String;
+
+procedure PrereqLine(Name, Exe: String);
+var
+  Found: String;
+begin
+  Found := FindTool(Exe);
+  if Found <> '' then
+    PrereqMemo.Lines.Add('[ok]      ' + Name + '   ' + Found)
+  else
   begin
-    Found := FindTool(Exe);
-    if Found <> '' then
-      PrereqMemo.Lines.Add('[ok]      ' + Name + '   ' + Found)
-    else
-    begin
-      PrereqMemo.Lines.Add('[MISSING] ' + Name);
-      Missing := Missing + Name + ' ';
-    end;
+    PrereqMemo.Lines.Add('[MISSING] ' + Name);
+    PrereqMissing := PrereqMissing + Name + ' ';
   end;
+end;
+
+procedure RefreshPrereqs();
 begin
   PrereqMemo.Lines.Clear();
-  Missing := '';
-  Line('Git', 'git.exe');
-  Line('Node.js', 'node.exe');
-  Line('GitHub CLI', 'gh.exe');
-  Line('Claude Code', 'claude.exe');
-  if Missing = '' then
+  PrereqMissing := '';
+  PrereqLine('Git', 'git.exe');
+  PrereqLine('Node.js', 'node.exe');
+  PrereqLine('GitHub CLI', 'gh.exe');
+  PrereqLine('Claude Code', 'claude.exe');
+  if PrereqMissing = '' then
     PrereqHint.Caption := CustomMessage('PrereqAllOk')
   else
     PrereqHint.Caption := CustomMessage('PrereqMissing');
@@ -419,7 +421,7 @@ begin
     + ' & pause"';
 end;
 
-{ Remove {app} from the user PATH on uninstall. }
+{ Remove the install folder from the user PATH on uninstall. }
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 var
   P, App: String;
