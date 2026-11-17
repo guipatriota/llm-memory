@@ -38,6 +38,8 @@ gh auth login --web                                 # connexion GitHub dans le n
 llm-memory init --language fr                       # ou en ; le reste est demandé interactivement
 ```
 
+Sans navigateur (SSH, WSL), `gh` affiche le code à usage unique et l'adresse `https://github.com/login/device` : ouvrez-la dans n'importe quel navigateur et saisissez le code. Si git n'a pas encore de `user.name`/`user.email`, `init` les définit pour les dépôts du coffre à partir de votre compte GitHub.
+
 Ubuntu 22.04 fournit Node.js 12, trop ancien : installez d'abord Node.js 18 ou plus récent depuis NodeSource, puis le paquet.
 
 Les exécutions planifiées utilisent des timers systemd utilisateur. Si `llm-memory init` indique que les timers n'ont pas pu être activés (typique en SSH ou dans WSL sans systemd), lancez une fois `loginctl enable-linger $USER` depuis une session graphique, ou lancez `llm-memory ingest` à la main.
