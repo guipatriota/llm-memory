@@ -23,6 +23,16 @@ function webLogin() {
 
 const setupGit = () => gh(['auth', 'setup-git']).ok;
 
+// Commit identity derived from the GitHub account: display name (or login) and the
+// no-reply address GitHub gives every user. { name, email } or null.
+function identity() {
+  const r = gh(['api', 'user', '--jq', '[.id, .login, (.name // "")] | @tsv']);
+  if (!r.ok) return null;
+  const [id, login, name] = r.stdout.split('	');
+  if (!id || !login) return null;
+  return { name: name || login, email: `${id}+${login}@users.noreply.github.com` };
+}
+
 // 'owner/name' -> true when the repository exists and is visible to this account.
 const repoExists = (full) => gh(['repo', 'view', full, '--json', 'name']).ok;
 
@@ -57,4 +67,4 @@ function probeLockRefs(dir) {
   return { ok: del.ok, detail: del.ok ? '' : del.out.split('\n')[0] };
 }
 
-module.exports = { authStatus, login, webLogin, setupGit, repoExists, repoInfo, createPrivateRepo, httpsUrl, splitRepo, probeLockRefs };
+module.exports = { authStatus, login, webLogin, setupGit, identity, repoExists, repoInfo, createPrivateRepo, httpsUrl, splitRepo, probeLockRefs };

@@ -46,5 +46,7 @@
   "status.lastRuns": "dernières exécutions",
   "status.memoryLinks": "liens de mémoire",
   "repair.done": "réparé : hooks, skills, liens de mémoire et exécutions planifiées réenregistrés",
-  "uninstall.done": "supprimé : hooks, exécutions planifiées, liens des skills et configuration machine. Conservés : le coffre ({vault}), son dossier sources/ et les liens de mémoire."
+  "uninstall.done": "supprimé : hooks, exécutions planifiées, liens des skills et configuration machine. Conservés : le coffre ({vault}), son dossier sources/ et les liens de mémoire.",
+  "init.identity.set": "identité git pour ce dépôt : {name} <{email}>",
+  "init.identity.failed": "git n'a pas de user.name/user.email et le compte GitHub n'a pas pu être lu ; lancez : git config --global user.name ... et user.email ..."
 }

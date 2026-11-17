@@ -61,6 +61,19 @@ function copyTemplate(src, dst) {
   }
 }
 
+// A fresh machine (WSL, a new laptop) often has no git user.name/user.email: commits
+// would fail. Set them for this repository only, from the GitHub account.
+function ensureIdentity(dir) {
+  const has = (k) => git(dir, ['config', '--get', k]).ok;
+  if (has('user.name') && has('user.email')) return false;
+  const id = gh.identity();
+  if (!id) throw new Error(t('init.identity.failed'));
+  if (!has('user.name')) must(dir, ['config', 'user.name', id.name]);
+  if (!has('user.email')) must(dir, ['config', 'user.email', id.email]);
+  say(t('init.identity.set', { name: id.name, email: id.email }));
+  return true;
+}
+
 function appendLog(vault, line) {
   fs.appendFileSync(path.join(vault, 'log.md'), `\n${line}\n`);
 }
@@ -119,6 +132,7 @@ function ensureSourcesRepo(vault, vcfg, owner, full) {
     if (info && !info.isEmpty) {
       say(t('init.sources.cloning', { full: sourcesFull }));
       must(vault, ['clone', '-q', vcfg.sources.remote, dir], { timeout: 600000 });
+      ensureIdentity(dir);
       return 'cloned';
     }
   } else {
@@ -128,6 +142,7 @@ function ensureSourcesRepo(vault, vcfg, owner, full) {
   fs.mkdirSync(dir, { recursive: true });
   must(dir, ['init', '-q', '-b', 'main']);
   must(dir, ['remote', 'add', 'origin', vcfg.sources.remote]);
+  ensureIdentity(dir);
   copyTemplate(path.join(TEMPLATES, 'sources'), dir);
   must(dir, ['add', '-A']);
   must(dir, ['commit', '-q', '-m', 'init: raw transcript store (private, may contain secrets)']);
@@ -186,6 +201,7 @@ async function init(rawOpts) {
 
   say(t('init.step.vault'));
   const { full, created } = ensureVaultRepo(opts, owner);
+  ensureIdentity(opts.vault);
   const vcfg = populateVault(opts.vault, opts);
 
   say(t('init.step.probe'));
@@ -235,4 +251,4 @@ async function init(rawOpts) {
   return { vault: opts.vault, full, vcfg };
 }
 
-module.exports = { init, checkPrerequisites, copyTemplate, resolveOptions };
+module.exports = { init, ensureIdentity, checkPrerequisites, copyTemplate, resolveOptions };

@@ -46,5 +46,7 @@
   "status.lastRuns": "last runs",
   "status.memoryLinks": "memory links",
   "repair.done": "repaired: hooks, skills, memory links and scheduled runs re-registered",
-  "uninstall.done": "removed: hooks, scheduled runs, skill links and machine config. Kept: the vault ({vault}), its sources/ and the memory links."
+  "uninstall.done": "removed: hooks, scheduled runs, skill links and machine config. Kept: the vault ({vault}), its sources/ and the memory links.",
+  "init.identity.set": "git identity for this repository: {name} <{email}>",
+  "init.identity.failed": "git has no user.name/user.email and the GitHub account could not be read; run: git config --global user.name ... and user.email ..."
 }
