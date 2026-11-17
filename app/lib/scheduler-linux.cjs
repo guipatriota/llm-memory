@@ -19,7 +19,10 @@ function available() {
 
 function service(appDir, kind) {
   const cli = path.join(appDir, 'cli.cjs');
-  const pathLine = `Environment=PATH=${process.env.PATH || '/usr/local/bin:/usr/bin:/bin'}`;
+  // Quoted: on WSL the PATH carries Windows folders with spaces, which an unquoted
+  // assignment makes systemd reject (and then drop) entirely.
+  const envPath = (process.env.PATH || '/usr/local/bin:/usr/bin:/bin').split('"').join('');
+  const pathLine = `Environment="PATH=${envPath}"`;
   return `[Unit]
 Description=llm-memory: ${kind} (headless Claude Code run)
 
