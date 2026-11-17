@@ -90,8 +90,8 @@ function ensureVaultRepo(opts, owner) {
     throw new Error(t('init.vault.notEmpty', { vault }));
   }
   if (gh.repoExists(full)) {
-    const info = gh.repoInfo(full);
-    if (info && info.isEmpty) {
+    const kind = gh.classifyRepo(full, 'vault', t);
+    if (kind === 'empty') {
       say(t('init.vault.emptyRemote', { full }));
     } else {
       say(t('init.vault.cloning', { full }));
@@ -128,8 +128,8 @@ function ensureSourcesRepo(vault, vcfg, owner, full) {
   const sourcesFull = `${full}-sources`;
   if (sources.hasSourcesRepo(vault)) return 'existing';
   if (gh.repoExists(sourcesFull)) {
-    const info = gh.repoInfo(sourcesFull);
-    if (info && !info.isEmpty) {
+    const kind = gh.classifyRepo(sourcesFull, 'sources', t);
+    if (kind === 'sources') {
       say(t('init.sources.cloning', { full: sourcesFull }));
       must(vault, ['clone', '-q', vcfg.sources.remote, dir], { timeout: 600000 });
       ensureIdentity(dir);

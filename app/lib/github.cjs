@@ -41,6 +41,34 @@ function repoInfo(full) {
   return r.ok ? JSON.parse(r.stdout) : null;
 }
 
+// Raw content of one file at the default branch, or null when absent or unreadable.
+function readFile(full, filePath) {
+  const r = gh(['api', `repos/${full}/contents/${filePath}`, '-H', 'Accept: application/vnd.github.raw+json']);
+  return r.ok ? r.stdout : null;
+}
+
+// What an existing repository can be used for: 'empty' (initialise it), 'vault' or
+// 'sources' (clone it: second machine), or a thrown error when it is public or holds
+// something else (for example a code project of the same name).
+function classifyRepo(full, kind, t) {
+  const info = repoInfo(full);
+  if (!info) throw new Error(t('init.repo.unreadable', { full }));
+  if (!info.isPrivate) throw new Error(t('init.repo.public', { full }));
+  if (info.isEmpty) return 'empty';
+  if (kind === 'vault') {
+    const raw = readFile(full, 'memory.config.json');
+    try {
+      if (raw && typeof JSON.parse(raw).language === 'string') return 'vault';
+    } catch {
+      /* not ours */
+    }
+    throw new Error(t('init.repo.notVault', { full }));
+  }
+  const readme = readFile(full, 'README.md') || '';
+  if (readme.includes('llm-memory')) return 'sources';
+  throw new Error(t('init.repo.notSources', { full }));
+}
+
 function createPrivateRepo(full, description) {
   const args = ['repo', 'create', full, '--private'];
   if (description) args.push('--description', description);
@@ -67,4 +95,4 @@ function probeLockRefs(dir) {
   return { ok: del.ok, detail: del.ok ? '' : del.out.split('\n')[0] };
 }
 
-module.exports = { authStatus, login, webLogin, setupGit, identity, repoExists, repoInfo, createPrivateRepo, httpsUrl, splitRepo, probeLockRefs };
+module.exports = { authStatus, login, webLogin, setupGit, identity, repoExists, repoInfo, readFile, classifyRepo, createPrivateRepo, httpsUrl, splitRepo, probeLockRefs };

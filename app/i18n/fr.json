@@ -8,7 +8,7 @@
   "init.ask.vault": "Dossier du coffre de mémoire",
   "init.ask.repo": "Nom du dépôt GitHub privé",
   "init.ask.sources": "Sauvegarder aussi les transcriptions brutes dans un second dépôt privé ? (elles peuvent contenir des secrets en clair)",
-  "init.summary": "coffre : {vault}\ndépôt : {repo} (privé)\nlangue : {language} ; sauvegarde des transcriptions : {sources}",
+  "init.summary": "coffre : {vault}\ndépôt : {repo}\nlangue : {language} ; sauvegarde des transcriptions : {sources}",
   "init.step.vault": "[2/7] Dépôt du coffre",
   "init.vault.existing": "{vault} est déjà un dépôt git, conservé tel quel",
   "init.vault.notEmpty": "{vault} existe et n'est pas vide ; choisissez un autre dossier ou un dossier vide",
@@ -48,5 +48,9 @@
   "repair.done": "réparé : hooks, skills, liens de mémoire et exécutions planifiées réenregistrés",
   "uninstall.done": "supprimé : hooks, exécutions planifiées, liens des skills et configuration machine. Conservés : le coffre ({vault}), son dossier sources/ et les liens de mémoire.",
   "init.identity.set": "identité git pour ce dépôt : {name} <{email}>",
-  "init.identity.failed": "git n'a pas de user.name/user.email et le compte GitHub n'a pas pu être lu ; lancez : git config --global user.name ... et user.email ..."
+  "init.identity.failed": "git n'a pas de user.name/user.email et le compte GitHub n'a pas pu être lu ; lancez : git config --global user.name ... et user.email ...",
+  "init.repo.unreadable": "{full} existe sur GitHub mais n'a pas pu être lu",
+  "init.repo.public": "{full} est PUBLIC sur GitHub. Un coffre de mémoire doit être privé : choisissez un autre nom de dépôt",
+  "init.repo.notVault": "{full} existe sur GitHub et n'est pas un coffre llm-memory (pas de memory.config.json). Choisissez un autre nom de dépôt",
+  "init.repo.notSources": "{full} existe sur GitHub et n'est pas un dépôt de transcriptions llm-memory. Choisissez un autre nom de dépôt"
 }

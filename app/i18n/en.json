@@ -8,7 +8,7 @@
   "init.ask.vault": "Folder for the memory vault",
   "init.ask.repo": "Private GitHub repository name",
   "init.ask.sources": "Also back up the raw transcripts to a second private repository? (they may contain secrets in plain text)",
-  "init.summary": "vault: {vault}\nrepository: {repo} (private)\nlanguage: {language}; transcript backup: {sources}",
+  "init.summary": "vault: {vault}\nrepository: {repo}\nlanguage: {language}; transcript backup: {sources}",
   "init.step.vault": "[2/7] Vault repository",
   "init.vault.existing": "{vault} is already a git repository, keeping it",
   "init.vault.notEmpty": "{vault} exists and is not empty; choose another folder or an empty one",
@@ -48,5 +48,9 @@
   "repair.done": "repaired: hooks, skills, memory links and scheduled runs re-registered",
   "uninstall.done": "removed: hooks, scheduled runs, skill links and machine config. Kept: the vault ({vault}), its sources/ and the memory links.",
   "init.identity.set": "git identity for this repository: {name} <{email}>",
-  "init.identity.failed": "git has no user.name/user.email and the GitHub account could not be read; run: git config --global user.name ... and user.email ..."
+  "init.identity.failed": "git has no user.name/user.email and the GitHub account could not be read; run: git config --global user.name ... and user.email ...",
+  "init.repo.unreadable": "{full} exists on GitHub but could not be read",
+  "init.repo.public": "{full} is PUBLIC on GitHub. A memory vault must be private: choose another repository name",
+  "init.repo.notVault": "{full} exists on GitHub and is not an llm-memory vault (no memory.config.json). Choose another repository name",
+  "init.repo.notSources": "{full} exists on GitHub and is not an llm-memory transcript store. Choose another repository name"
 }
